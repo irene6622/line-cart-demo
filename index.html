@@ -1,0 +1,179 @@
+﻿<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="UTF-8" />
+  <title>衛生紙試算購物車</title>
+  <style>
+    body {
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      margin: 20px;
+      background: #f7f7f7;
+    }
+    h1 {
+      font-size: 20px;
+      margin-bottom: 10px;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      background: #fff;
+    }
+    th, td {
+      border: 1px solid #ddd;
+      padding: 8px;
+      font-size: 14px;
+    }
+    th {
+      background: #f0f0f0;
+      text-align: left;
+    }
+    input[type="number"] {
+      width: 60px;
+    }
+    .summary {
+      margin-top: 15px;
+      padding: 10px;
+      background: #fff;
+      border: 1px solid #ddd;
+    }
+    .summary div {
+      margin: 4px 0;
+      font-size: 15px;
+    }
+    .highlight {
+      color: #c0392b;
+      font-weight: bold;
+    }
+  </style>
+</head>
+<body>
+  <h1>衛生紙試算購物車（滿 799 折 120，可累計）</h1>
+  <p>輸入各品項的「箱數（或組數）」即可自動計算總金額與折扣。</p>
+
+  <table>
+    <thead>
+      <tr>
+        <th>商品名稱</th>
+        <th>規格/描述</th>
+        <th>單價</th>
+        <th>數量</th>
+        <th>小計</th>
+      </tr>
+    </thead>
+    <tbody id="cart-body">
+      <!-- 商品列會由 JavaScript 產生 -->
+    </tbody>
+  </table>
+
+  <div class="summary">
+    <div>原價總額：<span id="total">0</span> 元</div>
+    <div>折扣金額（每滿 799 折 120，可累計）：<span id="discount" class="highlight">0</span> 元</div>
+    <div>折扣後金額：<span id="final-total" class="highlight">0</span> 元</div>
+  </div>
+
+  <script>
+    // 商品資料
+    const products = [
+      {
+        name: "舒潔棉柔厚韌抽取衛生紙",
+        desc: "90 抽＊24 包",
+        price: 389
+      },
+      {
+        name: "舒潔蘆薈抽取衛生紙",
+        desc: "100 抽＊30 包",
+        price: 399
+      },
+      {
+        name: "舒潔極絨厚 4 層抽取衛生紙",
+        desc: "80 抽＊20 包",
+        price: 349
+      },
+      {
+        name: "舒潔棉柔舒適迪士尼抽取衛生紙",
+        desc: "100 抽＊24 包",
+        price: 315
+      },
+      {
+        name: "舒潔濕式衛生紙",
+        desc: "40 抽＊7 包 贈 10 抽＊2 包",
+        price: 345
+      }
+    ];
+
+    const DISCOUNT_THRESHOLD = 799; // 每滿 799
+    const DISCOUNT_AMOUNT = 120;    // 折 120
+
+    const cartBody = document.getElementById("cart-body");
+    const totalSpan = document.getElementById("total");
+    const discountSpan = document.getElementById("discount");
+    const finalTotalSpan = document.getElementById("final-total");
+
+    // 建立商品列表
+    products.forEach((p, index) => {
+      const tr = document.createElement("tr");
+
+      const nameTd = document.createElement("td");
+      nameTd.textContent = p.name;
+      tr.appendChild(nameTd);
+
+      const descTd = document.createElement("td");
+      descTd.textContent = p.desc;
+      tr.appendChild(descTd);
+
+      const priceTd = document.createElement("td");
+      priceTd.textContent = p.price;
+      tr.appendChild(priceTd);
+
+      const qtyTd = document.createElement("td");
+      const input = document.createElement("input");
+      input.type = "number";
+      input.min = "0";
+      input.value = "0";
+      input.dataset.index = index.toString();
+      qtyTd.appendChild(input);
+      tr.appendChild(qtyTd);
+
+      const subTotalTd = document.createElement("td");
+      subTotalTd.textContent = "0";
+      subTotalTd.className = "subtotal";
+      tr.appendChild(subTotalTd);
+
+      cartBody.appendChild(tr);
+    });
+
+    function calculate() {
+      let total = 0;
+      const rows = cartBody.querySelectorAll("tr");
+
+      rows.forEach((row, i) => {
+        const price = products[i].price;
+        const input = row.querySelector("input[type='number']");
+        const qty = parseInt(input.value || "0", 10);
+        const subTotal = price * qty;
+        row.querySelector(".subtotal").textContent = subTotal.toString();
+        total += subTotal;
+      });
+
+      // 計算可折扣次數（可累計），只取整數
+      const times = Math.floor(total / DISCOUNT_THRESHOLD);
+      const discount = times * DISCOUNT_AMOUNT;
+      const finalTotal = total - discount;
+
+      totalSpan.textContent = total.toString();
+      discountSpan.textContent = discount.toString();
+      finalTotalSpan.textContent = finalTotal.toString();
+    }
+
+    // 監聽所有輸入框
+    cartBody.addEventListener("input", function (e) {
+      if (e.target && e.target.matches("input[type='number']")) {
+        calculate();
+      }
+    });
+
+    // 初始化計算一次
+    calculate();
+  </script>
+</body>
+</html>
