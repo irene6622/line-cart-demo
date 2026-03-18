@@ -55,7 +55,7 @@
 </head>
 <body>
   <h1>衛生紙試算購物車（滿 799 折 120，可累計）</h1>
-  <p>輸入各品項的「串數」，系統會自動計算總金額與折扣，2 入折價已套用。</p>
+  <p>輸入各品項的「串數」，系統會自動計算總金額與折扣，2 入折價與贈品已套用。</p>
 
   <table>
     <thead>
@@ -79,7 +79,8 @@
     <div id="gift-info" class="note"></div>
     <div class="note">
       備註：<br>
-      1. 買 1 串即為單串價；買 3 串 = 一組 2 入價 + 1 串單價，以此類推。
+      1. 買 1 串即為單串價；買 3 串 = 一組 2 入價 + 1 串單價，以此類推。<br>
+      2. 好韌真 Pro 贈品：所有好韌真 Pro 數量合併計算，買 1 送 2 包、買 2 送 5 包，可累計無上限。
     </div>
   </div>
 
@@ -90,7 +91,7 @@
         key: "paseo3",
         name: "PASEO 3層柔韌舒適抽取式衛生紙",
         desc: "100 抽＊24 包",
-        pricingNote: "單串 349 元；買 2 串可得 PASEO 濕式 20 抽×4 包／組 1 組",
+        pricingNote: "單串 349 元；每 2 串可得 PASEO 濕式 20 抽×4 包／組 1 組",
         priceSingle: 349
       },
       {
@@ -111,14 +112,14 @@
         key: "goodPro",
         name: "倍潔雅 好韌真 Pro 3層抽取式衛生紙",
         desc: "100 抽＊24 包",
-        pricingNote: "單串 309 元（買 1 送 2 包、買 2 送 5 包）",
+        pricingNote: "單串 309 元（所有好韌真 Pro 合併計算：買 1 送 2 包、買 2 送 5 包，可累計無上限）",
         priceSingle: 309
       },
       {
         key: "good3",
         name: "倍潔雅 好韌真 3層抽取衛生紙",
         desc: "100 抽＊24 包",
-        pricingNote: "單串 309 元，2 串 578 元（A 方案：每 2 串一組 578 元，餘數以 309 元計）",
+        pricingNote: "單串 309 元，2 串 578 元（每 2 串一組 578 元，餘數以 309 元計）",
         priceSingle: 309,
         pairPrice: 578
       },
@@ -126,7 +127,7 @@
         key: "weeClean",
         name: "唯潔雅 潔淨柔感抽取式衛生紙",
         desc: "100 抽＊24 包",
-        pricingNote: "單串 219 元，2 串 415 元（A 方案：每 2 串一組 415 元，餘數以 219 元計）",
+        pricingNote: "單串 219 元，2 串 415 元（每 2 串一組 415 元，餘數以 219 元計）",
         priceSingle: 219,
         pairPrice: 415
       }
@@ -180,8 +181,8 @@
       const rows = cartBody.querySelectorAll("tr");
 
       // 贈品計數
-      let goodProGiftPacks = 0; // 好韌真 Pro 贈幾包
-      let paseoWetGiftSets = 0; // PASEO 濕式贈幾組
+      let totalGoodProQty = 0;      // 所有好韌真 Pro 總數量
+      let paseoWetGiftSets = 0;     // PASEO 濕式贈幾組
 
       rows.forEach((row, i) => {
         const product = products[i];
@@ -199,18 +200,13 @@
           subTotal = pair * product.pairPrice + remain * product.priceSingle;
         }
 
-        // 贈品邏輯
+        // 統計好韌真 Pro 總數量（全部品項一起算）
         if (product.key === "goodPro") {
-          if (qty === 1) {
-            goodProGiftPacks += 2;
-          } else if (qty >= 2) {
-            // 目前規則：買 2 件送 5 包，假設 2 件以上都送 5 包
-            goodProGiftPacks += 5;
-          }
+          totalGoodProQty += qty;
         }
 
+        // PASEO 濕式贈品：每 2 串送 1 組，可累計
         if (product.key === "paseo3") {
-          // 每 2 串送 1 組濕式，可累計
           const sets = Math.floor(qty / 2);
           paseoWetGiftSets += sets;
         }
@@ -228,16 +224,24 @@
       discountSpan.textContent = discount.toString();
       finalTotalSpan.textContent = finalTotal.toString();
 
+      // 根據總好韌真 Pro 數量計算贈品（買 1 送 2、買 2 送 5，可累計）
+      let goodProGiftPacks = 0;
+      if (totalGoodProQty > 0) {
+        const pairs = Math.floor(totalGoodProQty / 2);
+        const remain = totalGoodProQty % 2;
+        goodProGiftPacks = pairs * 5 + (remain === 1 ? 2 : 0);
+      }
+
       // 組合贈品文字
       const giftTexts = [];
       if (goodProGiftPacks > 0) {
         giftTexts.push(
-          `倍潔雅 好韌真 Pro 3層抽取式衛生紙：本次贈品共 ${goodProGiftPacks} 包（依買 1 送 2、買 2 送 5 規則計算）。`
+          `倍潔雅 好韌真 Pro 3層抽取式衛生紙：本次共買 ${totalGoodProQty} 串，贈品 ${goodProGiftPacks} 包（依買 1 送 2、買 2 送 5，可累計規則計算）。`
         );
       }
       if (paseoWetGiftSets > 0) {
         giftTexts.push(
-          `PASEO 3層柔韌舒適抽取式衛生紙：本次可得 PASEO 濕式 20 抽×4 包／組 共 ${paseoWetGiftSets} 組。`
+          `PASEO 3層柔韌舒適抽取式衛生紙：本次可得 PASEO 濕式 20 抽×4 包／組 共 ${paseoWetGiftSets} 組（每 2 串 1 組，可累計）。`
         );
       }
       giftInfoDiv.textContent =
