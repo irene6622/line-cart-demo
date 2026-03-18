@@ -1,0 +1,265 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="UTF-8" />
+  <title>衛生紙試算購物車</title>
+  <style>
+    body {
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      margin: 20px;
+      background: #f7f7f7;
+    }
+    h1 {
+      font-size: 20px;
+      margin-bottom: 10px;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      background: #fff;
+      margin-bottom: 15px;
+    }
+    th, td {
+      border: 1px solid #ddd;
+      padding: 8px;
+      font-size: 14px;
+    }
+    th {
+      background: #f0f0f0;
+      text-align: left;
+    }
+    input[type="number"] {
+      width: 60px;
+    }
+    .summary {
+      margin-top: 15px;
+      padding: 10px;
+      background: #fff;
+      border: 1px solid #ddd;
+    }
+    .summary div {
+      margin: 4px 0;
+      font-size: 15px;
+    }
+    .highlight {
+      color: #c0392b;
+      font-weight: bold;
+    }
+    .note {
+      font-size: 13px;
+      color: #555;
+      margin-top: 6px;
+      line-height: 1.4;
+    }
+  </style>
+</head>
+<body>
+  <h1>衛生紙試算購物車（滿 799 折 120，可累計）</h1>
+  <p>輸入各品項的「箱數／串數」，系統會自動計算總金額與折扣，並提示贈品數量。</p>
+
+  <table>
+    <thead>
+      <tr>
+        <th>商品名稱</th>
+        <th>規格／描述</th>
+        <th>單價</th>
+        <th>數量</th>
+        <th>小計</th>
+      </tr>
+    </thead>
+    <tbody id="cart-body">
+      <!-- 商品列由 JavaScript 產生 -->
+    </tbody>
+  </table>
+
+  <div class="summary">
+    <div>原價總額：<span id="total">0</span> 元</div>
+    <div>折扣金額（每滿 799 折 120，可累計）：<span id="discount" class="highlight">0</span> 元</div>
+    <div>折扣後金額：<span id="final-total" class="highlight">0</span> 元</div>
+    <div class="note" id="gift-info"></div>
+  </div>
+
+  <script>
+    // 商品資料（原本舒潔 5 品項 + 新增 6 品項）
+    const products = [
+      // 舒潔系列（舊）
+      {
+        name: "舒潔棉柔厚韌抽取衛生紙",
+        desc: "90 抽＊24 包",
+        price: 389
+      },
+      {
+        name: "舒潔蘆薈抽取衛生紙",
+        desc: "100 抽＊30 包",
+        price: 399
+      },
+      {
+        name: "舒潔極絨厚 4 層抽取衛生紙",
+        desc: "80 抽＊20 包",
+        price: 349
+      },
+      {
+        name: "舒潔棉柔舒適迪士尼抽取衛生紙",
+        desc: "100 抽＊24 包（單特 299，原單特 315）",
+        price: 299
+      },
+      {
+        name: "舒潔濕式衛生紙",
+        desc: "40 抽＊7 包 贈 10 抽＊2 包",
+        price: 345
+      },
+
+      // 新檔期商品
+      {
+        name: "PASEO 3層柔韌舒適抽取式衛生紙",
+        desc: "100 抽＊24 包",
+        price: 349
+      },
+      {
+        name: "倍潔雅 柔軟舒適抽取式衛生紙",
+        desc: "100 抽＊24 包",
+        price: 219
+      },
+      {
+        name: "CONSOFY 3層抽取衛生紙",
+        desc: "120 抽＊24 包",
+        price: 365
+      },
+      {
+        name: "倍潔雅 好韌真 Pro 3層抽取式衛生紙",
+        desc: "100 抽＊24 包（買 1 件送 2 包、2 件送 5 包）",
+        price: 309,
+        promo: "goodPro"
+      },
+      {
+        name: "倍潔雅 好韌真 3層抽取衛生紙",
+        desc: "100 抽＊24 包（2 串 578 元，多人價）",
+        price: 309,
+        promo: "good3Multi"
+      },
+      {
+        name: "唯潔雅 潔淨柔感抽取式衛生紙",
+        desc: "100 抽＊24 包（2 串 415 元，多人價）",
+        price: 219,
+        promo: "weeMulti"
+      }
+    ];
+
+    // 折扣設定
+    const DISCOUNT_THRESHOLD = 799; // 每滿 799
+    const DISCOUNT_AMOUNT = 120;    // 折 120
+
+    const cartBody = document.getElementById("cart-body");
+    const totalSpan = document.getElementById("total");
+    const discountSpan = document.getElementById("discount");
+    const finalTotalSpan = document.getElementById("final-total");
+    const giftInfoDiv = document.getElementById("gift-info");
+
+    // 建立商品列表
+    products.forEach((p, index) => {
+      const tr = document.createElement("tr");
+
+      const nameTd = document.createElement("td");
+      nameTd.textContent = p.name;
+      tr.appendChild(nameTd);
+
+      const descTd = document.createElement("td");
+      descTd.textContent = p.desc;
+      tr.appendChild(descTd);
+
+      const priceTd = document.createElement("td");
+      priceTd.textContent = p.price;
+      tr.appendChild(priceTd);
+
+      const qtyTd = document.createElement("td");
+      const input = document.createElement("input");
+      input.type = "number";
+      input.min = "0";
+      input.value = "0";
+      input.dataset.index = index.toString();
+      qtyTd.appendChild(input);
+      tr.appendChild(qtyTd);
+
+      const subTotalTd = document.createElement("td");
+      subTotalTd.textContent = "0";
+      subTotalTd.className = "subtotal";
+      tr.appendChild(subTotalTd);
+
+      cartBody.appendChild(tr);
+    });
+
+    function calculate() {
+      let total = 0;
+      const rows = cartBody.querySelectorAll("tr");
+
+      // 贈品計數
+      let goodProGiftPacks = 0;       // 好韌真 Pro 贈幾包
+      let paseoWetGiftSets = 0;       // PASEO 濕式 20 抽×4 包/組 贈幾組
+
+      rows.forEach((row, i) => {
+        const price = products[i].price;
+        const input = row.querySelector("input[type='number']");
+        const qty = parseInt(input.value || "0", 10);
+        const subTotal = price * qty;
+        row.querySelector(".subtotal").textContent = subTotal.toString();
+        total += subTotal;
+
+        // 贈品邏輯
+        const promo = products[i].promo || "";
+
+        // 1) 倍潔雅 好韌真 Pro 3層抽取式衛生紙：買 1 件送 2 包、買 2 件送 5 包
+        if (promo === "goodPro") {
+          if (qty === 1) {
+            goodProGiftPacks += 2;
+          } else if (qty >= 2) {
+            // 目前規則：只寫到 2 件送 5 包，這裡假設買 2 件以上都送 5 包
+            goodProGiftPacks += 5;
+          }
+        }
+
+        // 2) PASEO 3層柔韌舒適抽取式衛生紙：買 2 件送 PASEO 濕式 20 抽×4 包/組
+        if (products[i].name.indexOf("PASEO 3層柔韌舒適抽取式衛生紙") !== -1) {
+          // 每 2 件送 1 組，可累計
+          const sets = Math.floor(qty / 2);
+          paseoWetGiftSets += sets;
+        }
+      });
+
+      // 滿額折扣（可累計）
+      const times = Math.floor(total / DISCOUNT_THRESHOLD);
+      const discount = times * DISCOUNT_AMOUNT;
+      const finalTotal = total - discount;
+
+      totalSpan.textContent = total.toString();
+      discountSpan.textContent = discount.toString();
+      finalTotalSpan.textContent = finalTotal.toString();
+
+      // 組合贈品說明文字
+      let giftTexts = [];
+
+      if (goodProGiftPacks > 0) {
+        giftTexts.push(`倍潔雅 好韌真 Pro 3層：本次贈品共 ${goodProGiftPacks} 包（依買 1 送 2、買 2 送 5 規則計算）。`);
+      }
+      if (paseoWetGiftSets > 0) {
+        giftTexts.push(`PASEO 3層柔韌舒適抽取式衛生紙：本次可得 PASEO 濕式 20 抽×4 包／組 共 ${paseoWetGiftSets} 組。`);
+      }
+
+      if (giftTexts.length > 0) {
+        giftInfoDiv.textContent = giftTexts.join(" ");
+      } else {
+        giftInfoDiv.textContent = "目前未達贈品條件。";
+      }
+    }
+
+    // 監聽所有輸入框
+    cartBody.addEventListener("input", function (e) {
+      if (e.target && e.target.matches("input[type='number']")) {
+        calculate();
+      }
+    });
+
+    // 初始化
+    calculate();
+  </script>
+</body>
+</html>
