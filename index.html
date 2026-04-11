@@ -8,24 +8,29 @@
     body { font-family: "PingFang TC", "Microsoft JhengHei", sans-serif; background: var(--bg); margin: 0; padding: 20px; }
     .container { max-width: 950px; margin: 0 auto; background: #fff; padding: 25px; border-radius: 15px; box-shadow: 0 4px 20px rgba(0,0,0,0.1); }
     h1 { text-align: center; color: var(--primary); margin-bottom: 10px; }
-    .promo-banner { background: #fff3cd; border: 1px solid #ffeeba; padding: 12px; border-radius: 8px; font-size: 14px; margin-bottom: 20px; color: #856404; }
+    .promo-banner { background: #fff3cd; border: 1px solid #ffeeba; padding: 12px; border-radius: 8px; font-size: 14px; margin-bottom: 20px; color: #856404; line-height: 1.6; }
     
     .table-container { overflow-x: auto; }
     table { width: 100%; border-collapse: collapse; margin-bottom: 20px; }
-    th { background: #a29bfe; color: white; padding: 12px; text-align: left; position: sticky; top: 0; }
-    td { padding: 10px; border-bottom: 1px solid #eee; font-size: 14px; }
+    th { background: #a29bfe; color: white; padding: 12px; text-align: left; position: sticky; top: 0; z-index: 10; }
+    td { padding: 12px 10px; border-bottom: 1px solid #eee; font-size: 15px; }
     tr:hover { background: #fdfdfd; }
     
-    input[type="number"] { width: 55px; padding: 5px; border: 1px solid #ccc; border-radius: 4px; text-align: center; }
-    .price-tag { color: #666; font-size: 12px; }
+    /* 放大單價與小計字體 */
+    .price-display { font-size: 18px; font-weight: bold; color: #2d3436; }
+    .subtotal-display { font-size: 20px; font-weight: 800; color: var(--primary); }
+    
+    input[type="number"] { width: 65px; padding: 8px; border: 2px solid #ddd; border-radius: 6px; text-align: center; font-size: 16px; }
+    input[type="number"]:focus { border-color: var(--primary); outline: none; }
+    
     .is-pant { color: #e84393; font-weight: bold; font-size: 12px; border: 1px solid #e84393; padding: 1px 4px; border-radius: 3px; margin-left: 5px; }
     
-    .summary { background: #2d3436; color: white; padding: 25px; border-radius: 12px; display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
-    .summary-left .item { margin-bottom: 10px; font-size: 15px; }
+    .summary { background: #2d3436; color: white; padding: 25px; border-radius: 12px; display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-top: 20px; }
+    .summary-left .item { margin-bottom: 10px; font-size: 16px; }
     .summary-right { border-left: 1px solid #555; padding-left: 25px; display: flex; flex-direction: column; justify-content: center; }
-    .highlight-red { color: #ff7675; font-weight: bold; }
-    .highlight-yellow { color: #f1c40f; font-weight: bold; font-size: 24px; }
-    .gift-box { background: rgba(255,255,255,0.1); padding: 10px; border-radius: 5px; margin-top: 10px; font-size: 13px; color: #55efc4; }
+    .highlight-red { color: #ff7675; font-weight: bold; font-size: 18px; }
+    .highlight-yellow { color: #f1c40f; font-weight: bold; font-size: 28px; }
+    .gift-box { background: rgba(255,255,255,0.1); padding: 12px; border-radius: 8px; margin-top: 10px; font-size: 14px; color: #55efc4; border: 1px dashed #55efc4; }
   </style>
 </head>
 <body>
@@ -36,17 +41,17 @@
   <div class="promo-banner">
     📢 <strong>優惠重點：</strong><br>
     1. 全店衛生棉滿 <strong>$259 折 $30</strong> (可累折) | 2. 蘇菲品牌滿 <strong>$349 折 $35</strong> (可累折)<br>
-    3. 買任一加購褲型棉現折 <strong>$10</strong> | 4. 滿 2 件送體驗包，滿 4 件送正貨 1 包。
+    3. 買任一商品加購「褲型棉」現折 <strong>$10</strong> | 4. 滿 2 件送體驗包，滿 4 件送正貨 1 包。
   </div>
 
   <div class="table-container">
     <table>
       <thead>
         <tr>
-          <th>品項名稱</th>
-          <th>單價/特價</th>
-          <th>數量</th>
-          <th>小計</th>
+          <th style="width: 45%;">品項名稱</th>
+          <th style="width: 20%;">單價/特價</th>
+          <th style="width: 15%;">數量</th>
+          <th style="width: 20%;">小計</th>
         </tr>
       </thead>
       <tbody id="cart-body"></tbody>
@@ -61,7 +66,7 @@
       <div class="item">褲型加購折抵: <span id="pant-discount" class="highlight-red">0</span> 元</div>
     </div>
     <div class="summary-right">
-      <div style="font-size: 16px; margin-bottom: 5px;">折扣後應付總額：</div>
+      <div style="font-size: 18px; margin-bottom: 5px;">折扣後應付總額：</div>
       <div id="final-total" class="highlight-yellow">0 元</div>
       <div class="gift-box">
         🎁 獲得贈品：<span id="gift-list">無</span>
@@ -71,8 +76,9 @@
 </div>
 
 <script>
+  // 修正邏輯：將 349 元組合設為一般品項，非褲型標籤
   const products = [
-    { name: "彈力貼身日用23cm 12片*12+熟睡褲L*2", price: 349, isPant: true },
+    { name: "彈力貼身日用23cm 12片*12+熟睡褲L*2", price: 349, isPant: false },
     { name: "彈力貼身超薄量少潔翼 17.5cm*3", price: 88, pairPrice: 169, isPant: false },
     { name: "彈力貼身超薄日用基本 23cm*4", price: 139, isPant: false },
     { name: "彈力貼身超薄日用潔翼 23cm*4", price: 139, isPant: false },
@@ -91,7 +97,7 @@
     { name: "天然草本抑菌26cm*3(贈護墊)", price: 149, isPant: false },
     { name: "清新涼感薄荷 23cm*2(贈護墊)", price: 169, isPant: false },
     { name: "清新涼感小黃瓜 25cm*2(贈護墊)", price: 149, isPant: false },
-    { name: "超熟睡細緻棉柔 35cm*8+熟睡褲L*2", price: 349, isPant: true },
+    { name: "超熟睡細緻棉柔 35cm*8+熟睡褲L*2", price: 349, isPant: false },
     { name: "超熟睡細緻棉柔 28cm*3", price: 139, isPant: false },
     { name: "超熟睡細緻棉柔 35cm*3", price: 138, isPant: false },
     { name: "超熟睡草本抑菌 28cm*2", price: 139, isPant: false },
@@ -117,12 +123,13 @@
     products.forEach((p, i) => {
       const tr = document.createElement('tr');
       tr.innerHTML = `
-        <td>${p.name}${p.isPant ? '<span class="is-pant">加購品</span>' : ''}</td>
+        <td>${p.name}${p.isPant ? '<span class="is-pant">加購褲型</span>' : ''}</td>
         <td>
-          <span class="price-tag">${p.price}${p.pairPrice ? ' (2組'+p.pairPrice+')' : ''}</span>
+          <span class="price-display">${p.pairPrice ? p.pairPrice : p.price}</span>
+          ${p.pairPrice ? '<div style="font-size:11px;color:#888;">原單件:'+p.price+'</div>' : ''}
         </td>
         <td><input type="number" min="0" value="0" data-index="${i}" oninput="calculate()"></td>
-        <td class="subtotal">0</td>
+        <td><span class="subtotal-display">0</span></td>
       `;
       cartBody.appendChild(tr);
     });
@@ -139,14 +146,13 @@
       const qty = parseInt(row.querySelector('input').value) || 0;
       let sub = 0;
 
-      // 兩組特價邏輯
       if (products[i].pairPrice && qty >= 2) {
         sub = (Math.floor(qty / 2) * products[i].pairPrice) + ((qty % 2) * products[i].price);
       } else {
         sub = qty * products[i].price;
       }
 
-      row.querySelector('.subtotal').textContent = sub;
+      row.querySelector('.subtotal-display').textContent = sub;
       
       if (qty > 0) {
         rawTotal += sub;
