@@ -1,80 +1,44 @@
 <!DOCTYPE html>
 <html lang="zh-Hant">
 <head>
-  <meta charset="UTF-8" />
-  <title>蘇菲衛生棉試算購物車（新規則）</title>
+  <meta charset="UTF-8">
+  <title>蘇菲衛生棉優惠試算購物車</title>
   <style>
-    body {
-      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-      margin: 20px;
-      background: #f7f7f7;
-    }
-    h1 {
-      font-size: 20px;
-      margin-bottom: 10px;
-    }
-    table {
-      width: 100%;
-      border-collapse: collapse;
-      background: #fff;
-      margin-bottom: 15px;
-    }
-    th, td {
-      border: 1px solid #ddd;
-      padding: 6px 8px;
-      font-size: 12px;
-    }
-    th {
-      background: #f0f0f0;
-      text-align: left;
-      position: sticky;
-      top: 0;
-    }
-    input[type="number"] {
-      width: 55px;
-    }
-    .summary {
-      margin-top: 15px;
-      padding: 10px;
-      background: #fff;
-      border: 1px solid #ddd;
-    }
-    .summary div {
-      margin: 4px 0;
-      font-size: 15px;
-    }
-    .highlight {
-      color: #c0392b;
-      font-weight: bold;
-    }
-    .note {
-      font-size: 13px;
-      color: #555;
-      margin-top: 6px;
-      line-height: 1.4;
-    }
-    .gift-strong {
-      font-size: 15px;
-      color: #c0392b;
-      font-weight: bold;
-    }
-    .special-price {
-      color: #e67e22;
-      font-weight: bold;
-    }
+    :root { --primary: #6c5ce7; --secondary: #a29bfe; --red: #d63031; --bg: #f9f9fb; }
+    body { font-family: system-ui, sans-serif; background: var(--bg); margin: 20px; color: #2d3436; }
+    .container { max-width: 900px; margin: 0 auto; background: #fff; padding: 20px; border-radius: 12px; box-shadow: 0 5px 15px rgba(0,0,0,0.08); }
+    h1 { font-size: 22px; text-align: center; color: var(--primary); }
+    .promo-box { background: #fff9db; border: 1px solid #ffe066; padding: 12px; border-radius: 8px; font-size: 13px; margin-bottom: 20px; line-height: 1.6; }
+    table { width: 100%; border-collapse: collapse; margin-bottom: 20px; }
+    th { background: var(--secondary); color: white; padding: 10px; text-align: left; font-size: 14px; }
+    td { border-bottom: 1px solid #eee; padding: 10px; font-size: 14px; }
+    input[type="number"] { width: 50px; padding: 5px; border: 1px solid #ddd; border-radius: 4px; }
+    .summary { background: #f1f2f6; padding: 20px; border-radius: 8px; }
+    .summary-item { display: flex; justify-content: space-between; margin: 8px 0; font-size: 15px; }
+    .discount { color: var(--red); font-weight: bold; }
+    .gift-info { color: #0984e3; font-weight: bold; }
+    .total-price { font-size: 20px; border-top: 2px solid #dfe6e9; padding-top: 10px; margin-top: 10px; color: var(--primary); }
+    .is-pant { color: #e84393; font-size: 12px; font-weight: bold; }
   </style>
 </head>
 <body>
-  <h1>蘇菲衛生棉試算購物車（新規則）</h1>
-  <p>輸入各品項的「串數」，系統會自動計算總金額與折扣，兩組特價已套用。</p>
+
+<div class="container">
+  <h1>蘇菲系列優惠試算</h1>
+  
+  <div class="promo-box">
+    💡 <strong>贈送規則：</strong>買 2 件送「洋甘菊體驗包2入」x2；買 4 件再送「彈力貼身23cm」x1<br>
+    🔥 <strong>全店優惠：</strong>每滿 $259 折 $30 (可累折)<br>
+    💖 <strong>品牌加碼：</strong>蘇菲全系列每滿 $349 折 $35 (可累折)<br>
+    👖 <strong>加購優惠：</strong>買任一商品加購「褲型棉」現折 $10 (單筆上限 $10)
+  </div>
 
   <table>
     <thead>
       <tr>
-        <th>品名</th>
-        <th>價格</th>
-        <th>兩組特價</th>
-        <th>輸入數量（串）</th>
+        <th>商品名稱 (部分簡稱)</th>
+        <th>單價</th>
+        <th>數量</th>
         <th>小計</th>
       </tr>
     </thead>
@@ -82,23 +46,90 @@
   </table>
 
   <div class="summary">
-    <div>原價總額：<span id="total">0</span> 元</div>
-    <div>全店滿259折30：<span id="store-discount">0</span> 元</div>
-    <div>蘇菲滿349折35：<span id="sophie-discount">0</span> 元</div>
-    <div>加購褲型棉折10：<span id="pants-discount">0</span> 元</div>
-    <hr>
-    <div>折扣後金額：<span id="final-total" class="highlight">0</span> 元</div>
-    <div id="gift-info" class="note"></div>
-    <div class="note">
-      備註：<br>
-      1. 兩組特價：每買 2 串套用特價，餘數按單價計。<br>
-      2. 贈品：買 2 件送 2 包清新涼感洋甘菊 23cm 2 入體驗包，買 4 件再送 1 包彈力貼身 23cm 12 片／包。
-    </div>
+    <div class="summary-item"><span>原始總額：</span><span id="raw-total">0</span></div>
+    <div class="summary-item"><span>全店滿額折 (滿259折30)：</span><span id="store-discount" class="discount">0</span></div>
+    <div class="summary-item"><span>品牌加碼折 (滿349折35)：</span><span id="brand-discount" class="discount">0</span></div>
+    <div class="summary-item"><span>褲型棉加購折：</span><span id="pant-discount" class="discount">0</span></div>
+    <div class="summary-item"><span>符合贈品：</span><span id="gift-text" class="gift-info">無</span></div>
+    <div class="summary-item total-price"><span>折扣後應付總額：</span><span id="final-total">0</span></div>
   </div>
+</div>
 
-  <script>
-    // 蘇菲衛生棉 31 品項資料
-    const products = [
-      {name: "蘇菲彈力貼身日用23ｃｍ12片＊12包＋超熟睡褲Ｌ＊２", priceSingle: 349, pairPrice: null, isPants: false},
-      {name: "蘇菲彈力貼身超薄量少潔翼 １７．５ｃｍ１６片＊３", priceSingle: 88, pairPrice: 169, isPants: false},
-      {name: "蘇菲彈力貼身超薄日用基本 ２３ｃｍ１４片＊４包
+<script>
+  // 根據圖片辨識的商品清單
+  const products = [
+    { name: "蘇菲 導管式棉條(量多型) 25入", price: 348, isPant: false },
+    { name: "蘇菲 導管式棉條(一般型) 10入", price: 139, isPant: false },
+    { name: "蘇菲 導管式棉條(量多型) 9入", price: 139, isPant: false },
+    { name: "蘇菲 導管式棉條(量多加強型) 25入", price: 358, isPant: false },
+    { name: "蘇菲 導管式棉條(量多加強型) 7入", price: 139, isPant: false },
+    { name: "蘇菲 彈力貼身超薄潔翼23cm 14片", price: 139, isPant: false },
+    { name: "蘇菲 彈力貼身超薄潔翼23cm 12片", price: 139, isPant: false },
+    { name: "蘇菲 超熟睡細緻棉柔35cm 8片", price: 139, isPant: false },
+    { name: "蘇菲 超熟睡細緻棉柔41.5cm 6片", price: 139, isPant: false },
+    { name: "蘇菲 褲型衛生棉(M/L) 2片", price: 69, isPant: true },
+    { name: "蘇菲 褲型衛生棉(XL) 2片", price: 69, isPant: true },
+    { name: "蘇菲 超熟睡內褲型衛生棉 5片", price: 149, isPant: true }
+  ];
+
+  const cartBody = document.getElementById('cart-body');
+
+  function render() {
+    products.forEach((p, i) => {
+      const tr = document.createElement('tr');
+      tr.innerHTML = `
+        <td>${p.name} ${p.isPant ? '<span class="is-pant">[褲型]</span>' : ''}</td>
+        <td>${p.price}</td>
+        <td><input type="number" value="0" min="0" oninput="calc()" data-index="${i}"></td>
+        <td class="subtotal">0</td>
+      `;
+      cartBody.appendChild(tr);
+    });
+  }
+
+  function calc() {
+    let totalQty = 0;
+    let rawTotal = 0;
+    let hasNormalItem = false;
+    let hasPantItem = false;
+
+    const rows = cartBody.querySelectorAll('tr');
+    rows.forEach((row, i) => {
+      const qty = parseInt(row.querySelector('input').value) || 0;
+      const sub = qty * products[i].price;
+      row.querySelector('.subtotal').innerText = sub;
+      
+      if (qty > 0) {
+        totalQty += qty;
+        rawTotal += sub;
+        if (products[i].isPant) hasPantItem = true;
+        else hasNormalItem = true;
+      }
+    });
+
+    // 折扣計算
+    const storeDiscount = Math.floor(rawTotal / 259) * 30;
+    const brandDiscount = Math.floor(rawTotal / 349) * 35;
+    const pantDiscount = (hasNormalItem && hasPantItem) ? 10 : 0;
+
+    // 贈品邏輯
+    let gifts = [];
+    if (totalQty >= 2) gifts.push("洋甘菊23cm 2入體驗包 x 2");
+    if (totalQty >= 4) gifts.push("彈力貼身23cm 12片/包 x 1");
+
+    // UI 更新
+    document.getElementById('raw-total').innerText = rawTotal;
+    document.getElementById('store-discount').innerText = `-${storeDiscount}`;
+    document.getElementById('brand-discount').innerText = `-${brandDiscount}`;
+    document.getElementById('pant-discount').innerText = `-${pantDiscount}`;
+    document.getElementById('gift-text').innerText = gifts.length > 0 ? gifts.join(' + ') : '未達標';
+    
+    const final = rawTotal - storeDiscount - brandDiscount - pantDiscount;
+    document.getElementById('final-total').innerText = final > 0 ? final : 0;
+  }
+
+  render();
+</script>
+
+</body>
+</html>
