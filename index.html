@@ -2,134 +2,179 @@
 <html lang="zh-Hant">
 <head>
   <meta charset="UTF-8">
-  <title>蘇菲衛生棉優惠試算購物車</title>
+  <title>蘇菲衛生棉購物試算工具</title>
   <style>
-    :root { --primary: #6c5ce7; --secondary: #a29bfe; --red: #d63031; --bg: #f9f9fb; }
-    body { font-family: system-ui, sans-serif; background: var(--bg); margin: 20px; color: #2d3436; }
-    .container { max-width: 900px; margin: 0 auto; background: #fff; padding: 20px; border-radius: 12px; box-shadow: 0 5px 15px rgba(0,0,0,0.08); }
-    h1 { font-size: 22px; text-align: center; color: var(--primary); }
-    .promo-box { background: #fff9db; border: 1px solid #ffe066; padding: 12px; border-radius: 8px; font-size: 13px; margin-bottom: 20px; line-height: 1.6; }
+    :root { --primary: #6c5ce7; --red: #d63031; --bg: #f4f4f9; }
+    body { font-family: "PingFang TC", "Microsoft JhengHei", sans-serif; background: var(--bg); margin: 0; padding: 20px; }
+    .container { max-width: 950px; margin: 0 auto; background: #fff; padding: 25px; border-radius: 15px; box-shadow: 0 4px 20px rgba(0,0,0,0.1); }
+    h1 { text-align: center; color: var(--primary); margin-bottom: 10px; }
+    .promo-banner { background: #fff3cd; border: 1px solid #ffeeba; padding: 12px; border-radius: 8px; font-size: 14px; margin-bottom: 20px; color: #856404; }
+    
+    .table-container { overflow-x: auto; }
     table { width: 100%; border-collapse: collapse; margin-bottom: 20px; }
-    th { background: var(--secondary); color: white; padding: 10px; text-align: left; font-size: 14px; }
-    td { border-bottom: 1px solid #eee; padding: 10px; font-size: 14px; }
-    input[type="number"] { width: 50px; padding: 5px; border: 1px solid #ddd; border-radius: 4px; }
-    .summary { background: #f1f2f6; padding: 20px; border-radius: 8px; }
-    .summary-item { display: flex; justify-content: space-between; margin: 8px 0; font-size: 15px; }
-    .discount { color: var(--red); font-weight: bold; }
-    .gift-info { color: #0984e3; font-weight: bold; }
-    .total-price { font-size: 20px; border-top: 2px solid #dfe6e9; padding-top: 10px; margin-top: 10px; color: var(--primary); }
-    .is-pant { color: #e84393; font-size: 12px; font-weight: bold; }
+    th { background: #a29bfe; color: white; padding: 12px; text-align: left; position: sticky; top: 0; }
+    td { padding: 10px; border-bottom: 1px solid #eee; font-size: 14px; }
+    tr:hover { background: #fdfdfd; }
+    
+    input[type="number"] { width: 55px; padding: 5px; border: 1px solid #ccc; border-radius: 4px; text-align: center; }
+    .price-tag { color: #666; font-size: 12px; }
+    .is-pant { color: #e84393; font-weight: bold; font-size: 12px; border: 1px solid #e84393; padding: 1px 4px; border-radius: 3px; margin-left: 5px; }
+    
+    .summary { background: #2d3436; color: white; padding: 25px; border-radius: 12px; display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+    .summary-left .item { margin-bottom: 10px; font-size: 15px; }
+    .summary-right { border-left: 1px solid #555; padding-left: 25px; display: flex; flex-direction: column; justify-content: center; }
+    .highlight-red { color: #ff7675; font-weight: bold; }
+    .highlight-yellow { color: #f1c40f; font-weight: bold; font-size: 24px; }
+    .gift-box { background: rgba(255,255,255,0.1); padding: 10px; border-radius: 5px; margin-top: 10px; font-size: 13px; color: #55efc4; }
   </style>
 </head>
 <body>
 
 <div class="container">
-  <h1>蘇菲系列優惠試算</h1>
+  <h1>蘇菲系列優惠試算表</h1>
   
-  <div class="promo-box">
-    💡 <strong>贈送規則：</strong>買 2 件送「洋甘菊體驗包2入」x2；買 4 件再送「彈力貼身23cm」x1<br>
-    🔥 <strong>全店優惠：</strong>每滿 $259 折 $30 (可累折)<br>
-    💖 <strong>品牌加碼：</strong>蘇菲全系列每滿 $349 折 $35 (可累折)<br>
-    👖 <strong>加購優惠：</strong>買任一商品加購「褲型棉」現折 $10 (單筆上限 $10)
+  <div class="promo-banner">
+    📢 <strong>優惠重點：</strong><br>
+    1. 全店衛生棉滿 <strong>$259 折 $30</strong> (可累折) | 2. 蘇菲品牌滿 <strong>$349 折 $35</strong> (可累折)<br>
+    3. 買任一加購褲型棉現折 <strong>$10</strong> | 4. 滿 2 件送體驗包，滿 4 件送正貨 1 包。
   </div>
 
-  <table>
-    <thead>
-      <tr>
-        <th>商品名稱 (部分簡稱)</th>
-        <th>單價</th>
-        <th>數量</th>
-        <th>小計</th>
-      </tr>
-    </thead>
-    <tbody id="cart-body"></tbody>
-  </table>
+  <div class="table-container">
+    <table>
+      <thead>
+        <tr>
+          <th>品項名稱</th>
+          <th>單價/特價</th>
+          <th>數量</th>
+          <th>小計</th>
+        </tr>
+      </thead>
+      <tbody id="cart-body"></tbody>
+    </table>
+  </div>
 
   <div class="summary">
-    <div class="summary-item"><span>原始總額：</span><span id="raw-total">0</span></div>
-    <div class="summary-item"><span>全店滿額折 (滿259折30)：</span><span id="store-discount" class="discount">0</span></div>
-    <div class="summary-item"><span>品牌加碼折 (滿349折35)：</span><span id="brand-discount" class="discount">0</span></div>
-    <div class="summary-item"><span>褲型棉加購折：</span><span id="pant-discount" class="discount">0</span></div>
-    <div class="summary-item"><span>符合贈品：</span><span id="gift-text" class="gift-info">無</span></div>
-    <div class="summary-item total-price"><span>折扣後應付總額：</span><span id="final-total">0</span></div>
+    <div class="summary-left">
+      <div class="item">原始總計: <span id="raw-total">0</span> 元</div>
+      <div class="item">全店折抵 (259折30): <span id="store-discount" class="highlight-red">0</span> 元</div>
+      <div class="item">品牌加碼 (349折35): <span id="brand-discount" class="highlight-red">0</span> 元</div>
+      <div class="item">褲型加購折抵: <span id="pant-discount" class="highlight-red">0</span> 元</div>
+    </div>
+    <div class="summary-right">
+      <div style="font-size: 16px; margin-bottom: 5px;">折扣後應付總額：</div>
+      <div id="final-total" class="highlight-yellow">0 元</div>
+      <div class="gift-box">
+        🎁 獲得贈品：<span id="gift-list">無</span>
+      </div>
+    </div>
   </div>
 </div>
 
 <script>
-  // 根據圖片辨識的商品清單
   const products = [
-    { name: "蘇菲 導管式棉條(量多型) 25入", price: 348, isPant: false },
-    { name: "蘇菲 導管式棉條(一般型) 10入", price: 139, isPant: false },
-    { name: "蘇菲 導管式棉條(量多型) 9入", price: 139, isPant: false },
-    { name: "蘇菲 導管式棉條(量多加強型) 25入", price: 358, isPant: false },
-    { name: "蘇菲 導管式棉條(量多加強型) 7入", price: 139, isPant: false },
-    { name: "蘇菲 彈力貼身超薄潔翼23cm 14片", price: 139, isPant: false },
-    { name: "蘇菲 彈力貼身超薄潔翼23cm 12片", price: 139, isPant: false },
-    { name: "蘇菲 超熟睡細緻棉柔35cm 8片", price: 139, isPant: false },
-    { name: "蘇菲 超熟睡細緻棉柔41.5cm 6片", price: 139, isPant: false },
-    { name: "蘇菲 褲型衛生棉(M/L) 2片", price: 69, isPant: true },
-    { name: "蘇菲 褲型衛生棉(XL) 2片", price: 69, isPant: true },
-    { name: "蘇菲 超熟睡內褲型衛生棉 5片", price: 149, isPant: true }
+    { name: "彈力貼身日用23cm 12片*12+熟睡褲L*2", price: 349, isPant: true },
+    { name: "彈力貼身超薄量少潔翼 17.5cm*3", price: 88, pairPrice: 169, isPant: false },
+    { name: "彈力貼身超薄日用基本 23cm*4", price: 139, isPant: false },
+    { name: "彈力貼身超薄日用潔翼 23cm*4", price: 139, isPant: false },
+    { name: "彈力貼身超薄日用細緻棉柔 26cm*4", price: 139, isPant: false },
+    { name: "彈力貼身超薄夜用潔翼 28cm*4", price: 139, isPant: false },
+    { name: "天然原生棉量少棉柔 17.5cm*4", price: 138, isPant: false },
+    { name: "天然原生棉超薄日用棉柔 23cm*3", price: 138, isPant: false },
+    { name: "天然原生棉超薄日用棉柔 26cm*2", price: 138, isPant: false },
+    { name: "天然原生棉極薄日用棉柔 23cm*3", price: 138, isPant: false },
+    { name: "天然原生棉超薄夜用棉柔 29cm*2", price: 138, isPant: false },
+    { name: "天然草本抑菌-鼠尾草 23cm*3", price: 138, isPant: false },
+    { name: "天然草本抑菌-鼠尾草 29cm*2", price: 138, isPant: false },
+    { name: "天然積雪草超薄日用 23cm*3", price: 138, isPant: false },
+    { name: "天然積雪草超薄日用 26cm*3", price: 138, isPant: false },
+    { name: "天然原生棉超薄26cm*3(贈護墊)", price: 149, isPant: false },
+    { name: "天然草本抑菌26cm*3(贈護墊)", price: 149, isPant: false },
+    { name: "清新涼感薄荷 23cm*2(贈護墊)", price: 169, isPant: false },
+    { name: "清新涼感小黃瓜 25cm*2(贈護墊)", price: 149, isPant: false },
+    { name: "超熟睡細緻棉柔 35cm*8+熟睡褲L*2", price: 349, isPant: true },
+    { name: "超熟睡細緻棉柔 28cm*3", price: 139, isPant: false },
+    { name: "超熟睡細緻棉柔 35cm*3", price: 138, isPant: false },
+    { name: "超熟睡草本抑菌 28cm*2", price: 139, isPant: false },
+    { name: "超熟睡草本抑菌 35cm*2", price: 139, isPant: false },
+    { name: "超熟睡細緻棉柔 41.5cm 8片", price: 89, pairPrice: 159, isPant: false },
+    { name: "超熟睡細緻棉柔 42cm 10片", price: 128, isPant: false },
+    { name: "超熟睡長效抑菌 42cm 8片", price: 128, isPant: false },
+    { name: "超熟睡內褲型 M號 6片", price: 139, isPant: true },
+    { name: "超熟睡內褲型 L號 6片", price: 139, isPant: true },
+    { name: "超熟睡內褲型 XL號 6片", price: 139, isPant: true },
+    { name: "超日安褲 M號 2片", price: 59, isPant: true },
+    { name: "超日安褲 L號 2片", price: 59, isPant: true },
+    { name: "超日安褲 XL號 2片", price: 59, isPant: true },
+    { name: "超熟睡內褲型-涼感L 2片", price: 59, isPant: true },
+    { name: "超熟睡內褲型-涼感XL 2片", price: 59, isPant: true },
+    { name: "加長超薄護墊-無香 17.5cm*2入", price: 69, isPant: false },
+    { name: "加長超薄護墊-花香 17.5cm*2入", price: 69, isPant: false }
   ];
 
   const cartBody = document.getElementById('cart-body');
 
-  function render() {
+  function init() {
     products.forEach((p, i) => {
       const tr = document.createElement('tr');
       tr.innerHTML = `
-        <td>${p.name} ${p.isPant ? '<span class="is-pant">[褲型]</span>' : ''}</td>
-        <td>${p.price}</td>
-        <td><input type="number" value="0" min="0" oninput="calc()" data-index="${i}"></td>
+        <td>${p.name}${p.isPant ? '<span class="is-pant">加購品</span>' : ''}</td>
+        <td>
+          <span class="price-tag">${p.price}${p.pairPrice ? ' (2組'+p.pairPrice+')' : ''}</span>
+        </td>
+        <td><input type="number" min="0" value="0" data-index="${i}" oninput="calculate()"></td>
         <td class="subtotal">0</td>
       `;
       cartBody.appendChild(tr);
     });
   }
 
-  function calc() {
-    let totalQty = 0;
+  function calculate() {
     let rawTotal = 0;
+    let totalQty = 0;
     let hasNormalItem = false;
     let hasPantItem = false;
 
     const rows = cartBody.querySelectorAll('tr');
     rows.forEach((row, i) => {
       const qty = parseInt(row.querySelector('input').value) || 0;
-      const sub = qty * products[i].price;
-      row.querySelector('.subtotal').innerText = sub;
+      let sub = 0;
+
+      // 兩組特價邏輯
+      if (products[i].pairPrice && qty >= 2) {
+        sub = (Math.floor(qty / 2) * products[i].pairPrice) + ((qty % 2) * products[i].price);
+      } else {
+        sub = qty * products[i].price;
+      }
+
+      row.querySelector('.subtotal').textContent = sub;
       
       if (qty > 0) {
-        totalQty += qty;
         rawTotal += sub;
+        totalQty += qty;
         if (products[i].isPant) hasPantItem = true;
         else hasNormalItem = true;
       }
     });
 
-    // 折扣計算
     const storeDiscount = Math.floor(rawTotal / 259) * 30;
     const brandDiscount = Math.floor(rawTotal / 349) * 35;
     const pantDiscount = (hasNormalItem && hasPantItem) ? 10 : 0;
-
-    // 贈品邏輯
+    
     let gifts = [];
-    if (totalQty >= 2) gifts.push("洋甘菊23cm 2入體驗包 x 2");
-    if (totalQty >= 4) gifts.push("彈力貼身23cm 12片/包 x 1");
+    if (totalQty >= 2) gifts.push("洋甘菊23cm體驗包 x 1");
+    if (totalQty >= 4) gifts.push("彈力貼身23cm 12片裝 x 1");
 
-    // UI 更新
-    document.getElementById('raw-total').innerText = rawTotal;
-    document.getElementById('store-discount').innerText = `-${storeDiscount}`;
-    document.getElementById('brand-discount').innerText = `-${brandDiscount}`;
-    document.getElementById('pant-discount').innerText = `-${pantDiscount}`;
-    document.getElementById('gift-text').innerText = gifts.length > 0 ? gifts.join(' + ') : '未達標';
+    document.getElementById('raw-total').textContent = rawTotal;
+    document.getElementById('store-discount').textContent = `-${storeDiscount}`;
+    document.getElementById('brand-discount').textContent = `-${brandDiscount}`;
+    document.getElementById('pant-discount').textContent = `-${pantDiscount}`;
+    document.getElementById('gift-list').textContent = gifts.length > 0 ? gifts.join(' + ') : '無';
     
     const final = rawTotal - storeDiscount - brandDiscount - pantDiscount;
-    document.getElementById('final-total').innerText = final > 0 ? final : 0;
+    document.getElementById('final-total').textContent = (final > 0 ? final : 0) + " 元";
   }
 
-  render();
+  init();
 </script>
-
 </body>
 </html>
