@@ -2,24 +2,28 @@
 <html lang="zh-Hant">
 <head>
   <meta charset="UTF-8">
-  <title>靠得住/自由適 最終修正版試算</title>
+  <title>靠得住/自由適 試算工具 (修正版)</title>
   <style>
-    :root { --primary: #e84393; --blue: #0984e3; --bg: #f9f9fb; }
+    :root { --primary: #e84393; --blue: #0984e3; --bg: #f9f9fb; --orange: #f39c12; }
     body { font-family: "PingFang TC", "Microsoft JhengHei", sans-serif; background: var(--bg); margin: 0; padding: 20px; }
     .container { max-width: 1000px; margin: 0 auto; background: #fff; padding: 25px; border-radius: 15px; box-shadow: 0 4px 20px rgba(0,0,0,0.1); }
     h1 { text-align: center; color: var(--primary); font-size: 24px; }
+    
     .promo-banner { background: #fff3cd; border: 1px solid #ffeeba; padding: 15px; border-radius: 8px; font-size: 14px; margin-bottom: 20px; color: #856404; line-height: 1.6; }
     
     table { width: 100%; border-collapse: collapse; margin-bottom: 20px; }
     th { background: var(--primary); color: white; padding: 12px; text-align: left; position: sticky; top: 0; z-index: 10; }
-    td { padding: 12px 10px; border-bottom: 1px solid #eee; font-size: 15px; }
+    td { padding: 15px 10px; border-bottom: 1px solid #eee; font-size: 15px; }
     
     .price-info { font-size: 18px; font-weight: bold; color: #2d3436; }
-    .subtotal-display { font-size: 20px; font-weight: 800; color: var(--blue); }
-    .combo-text { font-size: 11px; color: #e67e22; display: block; }
+    .subtotal-display { font-size: 22px; font-weight: 800; color: var(--blue); }
     
-    input[type="number"] { width: 70px; padding: 8px; border: 2px solid #ddd; border-radius: 6px; text-align: center; font-size: 18px; }
-    input[type="number"]:focus { border-color: var(--primary); outline: none; }
+    /* 強化組合價顯示 */
+    .bogo-tag { background: #ff7675; color: white; padding: 2px 6px; border-radius: 4px; font-size: 13px; font-weight: bold; margin-left: 5px; }
+    .combo-pill { display: inline-block; background: #ffeaa7; color: #d35400; padding: 2px 8px; border-radius: 12px; font-size: 12px; font-weight: bold; margin-top: 4px; border: 1px solid #f39c12; }
+    
+    input[type="number"] { width: 70px; padding: 8px; border: 2px solid #ddd; border-radius: 6px; text-align: center; font-size: 20px; background: #fdfdfd; }
+    input[type="number"]:focus { border-color: var(--primary); outline: none; background: #fff; }
     
     .tag { font-size: 11px; padding: 2px 5px; border-radius: 4px; margin-left: 5px; color: white; font-weight: bold; }
     .tag-free { background: #6c5ce7; }
@@ -28,18 +32,18 @@
     .summary { background: #2d3436; color: white; padding: 25px; border-radius: 12px; display: grid; grid-template-columns: 1.2fr 1fr; gap: 20px; margin-top: 20px; }
     .summary-left .item { margin-bottom: 12px; font-size: 16px; display: flex; justify-content: space-between; border-bottom: 1px solid #444; padding-bottom: 5px; }
     .summary-right { border-left: 1px solid #555; padding-left: 25px; display: flex; flex-direction: column; justify-content: center; }
-    .final-val { color: #f1c40f; font-weight: bold; font-size: 36px; }
-    .gift-box { background: rgba(255,255,255,0.1); padding: 15px; border-radius: 8px; margin-top: 10px; color: #55efc4; border: 1px dashed #55efc4; font-size: 15px; }
+    .final-val { color: #f1c40f; font-weight: bold; font-size: 38px; }
+    .gift-box { background: rgba(255,255,255,0.1); padding: 15px; border-radius: 8px; margin-top: 10px; color: #55efc4; border: 1px dashed #55efc4; font-size: 16px; }
     .highlight-red { color: #ff7675; font-weight: bold; }
   </style>
 </head>
 <body>
 
 <div class="container">
-  <h1>靠得住 / 自由適 試算購物車</h1>
+  <h1>靠得住 / 自由適 試算工具</h1>
   
   <div class="promo-banner">
-    🎁 <strong>贈品規則：</strong>滿 2 件送茶樹體驗包(3包)；滿 6 件送可麗舒(10包/串) | <strong>換算：</strong>護墊/褲型 2 包算 1 件<br>
+    🎁 <strong>贈品：</strong>滿 2 件送茶樹體驗包(3包)；滿 6 件送可麗舒(10包/串) | <strong>換算：</strong>護墊/褲型 2 包算 1 件<br>
     🔥 <strong>折扣：</strong>衛生棉 259-30 | 靠得住全系列 349-30 | 自由適 2件-40 & 599-70 (皆可累折)
   </div>
 
@@ -47,7 +51,7 @@
     <thead>
       <tr>
         <th style="width: 45%;">品項名稱</th>
-        <th style="width: 25%;">單價/組合價</th>
+        <th style="width: 25%;">單價 / 組合優惠</th>
         <th style="width: 15%;">數量</th>
         <th style="width: 15%;">小計</th>
       </tr>
@@ -64,24 +68,23 @@
       <div class="item">衛生棉 (259-30): <span id="pad-discount" class="highlight-red">0</span></div>
     </div>
     <div class="summary-right">
-      <div>應付總額：</div>
+      <div style="font-size: 18px;">應付總額：</div>
       <div id="final-total" class="final-val">0 元</div>
       <div class="gift-box">🎁 贈品：<span id="gift-text">無</span></div>
-      <div style="font-size: 14px; margin-top: 10px; color: #bdc3c7;">計件總數：<span id="count-text" style="color:#fff; font-weight:bold;">0</span> 件</div>
+      <div style="font-size: 14px; margin-top: 10px; color: #bdc3c7;">計算件數：<span id="count-text" style="color:#fff; font-weight:bold;">0</span> 件</div>
     </div>
   </div>
 </div>
 
 <script>
-  // 根據文字清單錄入
   const products = [
-    { name: "好菌Plus+衛生棉 日用24cm 10片*2包", price: 195, isPad: true },
+    { name: "好菌Plus+衛生棉 日用24cm 10片*2包", price: 390, p2: 195, isPad: true, isBogo: true },
     { name: "茶樹舒涼棉-棉柔 23cm 18片", price: 89, p2: 169, isPad: true },
     { name: "茶樹舒涼棉-棉柔 26cm 17片", price: 89, p2: 169, isPad: true },
     { name: "茶樹舒涼棉-棉柔 28cm 16片", price: 89, p2: 169, isPad: true },
     { name: "茶樹舒涼棉-棉柔 35cm 10片", price: 85, p2: 169, isPad: true },
-    { name: "草本抑菌蔓越莓加強 日夜28cm 11片*2包", price: 195, isPad: true },
-    { name: "草本抑菌蔓越莓加強 夜用35cm 8片*2入", price: 195, isPad: true },
+    { name: "草本抑菌蔓越莓加強 日夜28cm 11片*2包", price: 390, p2: 195, isPad: true, isBogo: true },
+    { name: "草本抑菌蔓越莓加強 夜用35cm 8片*2入", price: 390, p2: 195, isPad: true, isBogo: true },
     { name: "草本抑菌衛生棉 日用23cm 14片*3贈6片", price: 155, p2: 299, isPad: true },
     { name: "草本抑菌衛生棉 日用26cm 13片*3贈6片", price: 155, p2: 299, isPad: true },
     { name: "草本抑菌衛生棉 夜用28cm 12片*3贈6片", price: 155, p2: 299, isPad: true },
@@ -112,14 +115,20 @@
       let tag = p.isFree ? '<span class="tag tag-free">自由適</span>' : '';
       if(p.isHalf) tag += '<span class="tag tag-half">2換1件</span>';
       
-      let priceDesc = p.price;
-      if(p.p2) priceDesc += ` <span class="combo-text">2件:${p.p2}</span>`;
-      if(p.p4) priceDesc += ` <span class="combo-text">4件:${p.p4}</span>`;
+      let priceDisplay = p.isBogo ? 195 : p.price;
+      let bogoBadge = p.isBogo ? '<span class="bogo-tag">買一送一</span>' : '';
+      
+      let comboInfo = "";
+      if(p.p2) comboInfo += `<div class="combo-pill">2件特價: $${p.p2}</div> `;
+      if(p.p4) comboInfo += `<div class="combo-pill">4件特價: $${p.p4}</div>`;
 
       const tr = document.createElement('tr');
       tr.innerHTML = `
         <td>${p.name}${tag}</td>
-        <td><span class="price-info">${priceDesc}</span></td>
+        <td>
+            <span class="price-info">$${priceDisplay}</span>${bogoBadge}
+            ${comboInfo}
+        </td>
         <td><input type="number" min="0" value="0" oninput="calculate()" data-index="${i}"></td>
         <td><span class="subtotal-display">0</span></td>
       `;
@@ -137,7 +146,6 @@
       const p = products[i];
       let sub = 0;
 
-      // 組合價邏輯：優先 4 件，次之 2 件，最後單件
       let tempQty = qty;
       if (p.p4 && tempQty >= 4) {
         sub += Math.floor(tempQty / 4) * p.p4;
@@ -147,9 +155,12 @@
         sub += Math.floor(tempQty / 2) * p.p2;
         tempQty %= 2;
       }
-      sub += tempQty * p.price;
+      
+      // 如果是買一送一但只買一件，按比例(390/2)或原價計
+      let unitPrice = p.isBogo ? (p.price / 2) : p.price;
+      sub += tempQty * unitPrice;
 
-      input.closest('tr').querySelector('.subtotal-display').textContent = sub;
+      input.closest('tr').querySelector('.subtotal-display').textContent = Math.round(sub);
 
       if (qty > 0) {
         rawTotal += sub;
@@ -171,7 +182,7 @@
     if (totalItems >= 6) gift = "可麗舒100抽x10包/串";
     else if (totalItems >= 2) gift = "茶樹舒涼棉體驗包 x 3 包";
 
-    document.getElementById('raw-total').textContent = rawTotal;
+    document.getElementById('raw-total').textContent = Math.round(rawTotal);
     document.getElementById('free-qty-discount').textContent = `-${dFreeQty}`;
     document.getElementById('free-money-discount').textContent = `-${dFreeMoney}`;
     document.getElementById('brand-discount').textContent = `-${dBrand}`;
@@ -179,7 +190,7 @@
     document.getElementById('gift-text').textContent = gift;
     document.getElementById('count-text').textContent = totalItems;
     
-    const finalVal = rawTotal - dFreeQty - dFreeMoney - dBrand - dPad;
+    const finalVal = Math.round(rawTotal - dFreeQty - dFreeMoney - dBrand - dPad);
     document.getElementById('final-total').textContent = (finalVal > 0 ? finalVal : 0) + " 元";
   }
 
